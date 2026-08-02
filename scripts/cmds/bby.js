@@ -215,10 +215,59 @@ module.exports.onChat = async ({ api, event }) => {
         if (event.type !== "message_reply" && mahmud.some(word => message.startsWith(word))) {
             api.setMessageReaction("🪽", event.messageID, () => { }, true);
             api.sendTypingIndicator(event.threadID, true);
-            
-            const messageParts = message.trim().split(/\s+/);
 
-            // কাস্টম ৩-স্টেপ রিপ্লাই ডেটাবেজ (Bangla, Banglish, English)
+            // ১. হেল্প চেক
+            if (message.includes("help")) {
+                const helpMenu = `👑 ═══════ ❪ LALA BOT MENU ❫ ═══════ 👑
+✨ Welcome to the VIP Command Directory! ✨
+───────────────────────────
+
+📌 🛠️ MAIN COMMANDS (মূল কমান্ডসমূহ)
+• !baby help ➔ ভিআইপি হেল্প মেনু দেখা।
+• !baby teach [প্রশ্ন] - [উত্তর] ➔ বটকে নতুন প্রশ্ন শেখানো।
+• !baby remove [প্রশ্ন] - [ইনডেক্স] ➔ উত্তর মুছে ফেলা।
+• !baby edit [পুরোনো] - [নতুন] ➔ উত্তর এডিট করা।
+• !baby list / list all ➔ শেখানো উত্তরের তালিকা বা লিডারবোর্ড।
+
+───────────────────────────
+📌 💕 ROMANTIC & RESPONSES (তিন ভাষার সাপোর্ট)
+
+1. I Love You / ভালোবাসি / Bhalobashi:
+   • Bangla: 🙈 হুট করে এত ভালোবাসা কোত্থেকে আসলো?
+   • Banglish: Hut kore eto bhalobasha koththoke ashlo?
+   • English: Suddenly so much love coming from where?
+
+2. Miss You / মিস করি / Miss korchi:
+   • Bangla: 🥺 মনে যখন এতই পড়ে, সামনে এসে দাঁড়াচ্ছ না কেন?
+   • Banglish: Mone jokhon etoi pore, shamne eshe darachho na keno?
+   • English: If you miss me so much, why not stand in front of me?
+
+3. Ki korcho / কী করো / What are you doing:
+   • Bangla: 🙈 তোমার একটা মেসেজের অপেক্ষায় বসে ছিলাম!
+   • Banglish: Tomar ekta messager opekkhae bose thaklam!
+   • English: I was waiting for your message!
+
+4. Rag korcho / রাগ করছো / Are you angry:
+   • Bangla: 🌹 একটু আদুরে কণ্ঠে ডাকলেই তো গলে যাবো!
+   • Banglish: Ektu adure konthe daklei to gole jabo!
+   • English: Call me softly and I will melt!
+
+5. Khaiso / খাইসো / Have you eaten:
+   • Bangla: 🥺 তুমি ছাড়া কি কিছু মুখে রোচে? তুমি খাইসো?
+   • Banglish: Tumi chara ki kichu mukhe roche? Tumi khaiso?
+   • English: Does anything taste good without you? Did you eat?
+
+6. Bad Words / গালিগালাজ / Abuse:
+   • Bangla: 🥱 তোমার পারিবারিক শিক্ষার একটা সুন্দর ধারণা পেয়ে গেলাম!
+   • Banglish: Tomar paribarik shikkhar ekta sundor dharona peye gelam!
+   • English: Got a clear idea about your family manner!
+
+───────────────────────────
+👑 Designed & Managed by: LALA ADMIN`;
+                return api.sendMessage(helpMenu, event.threadID, event.messageID);
+            }
+
+            // ২. কাস্টম রেসপন্স তালিকা
             const customResponses = [
                 {
                     keywords: ["love", "ভালোবাসি", "bhalobashi"],
@@ -278,57 +327,41 @@ module.exports.onChat = async ({ api, event }) => {
                 }
             }
 
-            const randomMessage = matchedReply ? [matchedReply] : [
-                "👋 Hello, bolo ki khobor? / Hello, বলো কী খবর?",
-                "✨ Alhumdulillah bhalo, tumi kemon aso? / আলহামদুলিল্লাহ ভালো, তুমি কেমন আছো?",
-                "🎮 Boro boro kotha na bole cholo adda di! / বড় বড় কথা না বলে চলো আড্ডা দিই!"
-            ];
+            // ৩. শুধু ট্রিগার নাম (যেমন: baby, bot) লিখলে সরাসরি 'বলো' উত্তর দেবে
+            let userText = message;
+            for (const prefix of mahmud) {
+                if (message.startsWith(prefix)) {
+                    userText = message.substring(prefix.length).trim();
+                    break;
+                }
+            }
 
-            const hinataMessage = randomMessage[Math.floor(Math.random() * randomMessage.length)];
+            let finalResponse = matchedReply;
 
-            if (messageParts.length === 1 && attachments.length === 0) {
-               api.sendMessage(hinataMessage, event.threadID, (err, info) => {
-                    if (!err) {
-                    global.GoatBot.onReply.set(info.messageID, {
-                           commandName: this.config.name,
-                           type: "reply",
-                           messageID: info.messageID,
-                           author: event.senderID,
-                           text: hinataMessage
-                        });
-                    }
-                }, event.messageID);
-            } else {
-                let userText = message;
-                for (const prefix of mahmud) {
-                    if (message.startsWith(prefix)) {
-                        userText = message.substring(prefix.length).trim();
-                        break;
+            if (!finalResponse) {
+                if (!userText) {
+                    finalResponse = "বলো, আমি শুনছি! 🌸";
+                } else {
+                    try {
+                        const res = await axios.post(`${await baseApiUrl()}/api/hinata`, { text: userText, style: 3, attachments });
+                        finalResponse = res.data.message;
+                    } catch {
+                        finalResponse = "error baby🥹";
                     }
                 }
-
-                const getBotResponse = async (text, attachments) => {
-                    try {
-                        const res = await axios.post(`${await baseApiUrl()}/api/hinata`, { text, style: 3, attachments });
-                        return res.data.message;
-                    } catch {
-                        return "error baby🥹";
-                    }
-                };
-
-                const botResponse = matchedReply || await getBotResponse(userText, attachments);
-                api.sendMessage(botResponse, event.threadID, (err, info) => {
-                    if (!err) {
-                    global.GoatBot.onReply.set(info.messageID, {
-                           commandName: this.config.name,
-                           type: "reply",
-                           messageID: info.messageID,
-                           author: event.senderID,
-                           text: botResponse
-                        });
-                    }
-                }, event.messageID);
             }
+
+            api.sendMessage(finalResponse, event.threadID, (err, info) => {
+                if (!err) {
+                    global.GoatBot.onReply.set(info.messageID, {
+                        commandName: this.config.name,
+                        type: "reply",
+                        messageID: info.messageID,
+                        author: event.senderID,
+                        text: finalResponse
+                    });
+                }
+            }, event.messageID);
         }
     } catch (err) {
         console.error(err);
