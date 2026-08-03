@@ -49,7 +49,7 @@ function cleanText(text) {
 module.exports.config = {
     name: "baby",
     aliases: ["bby", "bbu", "jan", "janu", "wifey", "bot", "hinata", "hina", "pakhi"],
-    version: "3.7",
+    version: "3.8",
     author: "MahMUD",
     countDown: 0,
     role: 0,
@@ -161,8 +161,17 @@ module.exports.onStart = async ({ api, event, args, usersData }) => {
     }
 };
 
+// 📌 Unsend/Delete ফাংশন যুক্ত করা হয়েছে onReply-তে
 module.exports.onReply = async ({ api, event }) => {
     if (event.type !== "message_reply") return;
+
+    const replyText = event.body?.toLowerCase().trim();
+
+    // বটের পাঠানো যেকোনো মেসেজে 'unsend' বা 'delete' লিখে রিপ্লাই দিলে মেসেজটি মুছে যাবে
+    if (replyText === "unsend" || replyText === "delete" || replyText === "ডিলিট") {
+        return api.unsendMessage(event.messageReply.messageID);
+    }
+
     try {
         const getBotResponse = async (text, attachments) => {
             try {
@@ -306,7 +315,6 @@ module.exports.onChat = async ({ api, event }) => {
 
             // ৩. কাস্টম রেসপন্স লিস্ট
             const customResponses = [
-                // --- নতুন যোগ করা LALA LOVE প্রশ্ন-উত্তর তালিকা ---
                 {
                     keywords_bn: ["লালা কে"],
                     keywords_en: ["lala ke", "who is lala"],
@@ -532,8 +540,6 @@ module.exports.onChat = async ({ api, event }) => {
                     banglish: "Tumi amader adorer chele. 😄",
                     filePath: ""
                 },
-
-                // --- পূর্বের VIP LOVE CHAT ডায়ালগ লিস্ট (১ থেকে ৩০) ---
                 {
                     keywords_bn: ["হেই কী করছো", "কী করছো"],
                     keywords_en: ["hey what are you doing", "what are you doing"],
@@ -804,8 +810,6 @@ module.exports.onChat = async ({ api, event }) => {
                     banglish: "Karon\nekhon amra\nekksathe achi. 💞",
                     filePath: ""
                 },
-
-                // --- সাধারণ কার্ড ও অডিও/মিডিয়া কার্ডসমূহ ---
                 {
                     keywords_bn: ["ভালোবাসি", "ভালোবাসো"],
                     keywords_en: ["love", "i love you"],
@@ -942,7 +946,6 @@ module.exports.onChat = async ({ api, event }) => {
                 }
             }
 
-            // ৪. নাম (pakhi / baby / bot ইত্যাদি) দিয়ে কথা বলা হ্যান্ডেল করা
             let userText = message;
             for (const prefix of mahmud) {
                 if (message.startsWith(prefix)) {
