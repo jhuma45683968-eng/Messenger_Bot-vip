@@ -16,7 +16,11 @@ const mahmud = [
     "hina",
     "hinata",
     "pakhi",
-    "পাখি"
+    "পাখি",
+    "lala",
+    "লালা",
+    "admin",
+    "অ্যাডমিন"
 ];
 
 const baseApiUrl = async () => {
@@ -48,12 +52,12 @@ function cleanText(text) {
 
 module.exports.config = {
     name: "baby",
-    aliases: ["bby", "bbu", "jan", "janu", "wifey", "bot", "hinata", "hina", "pakhi"],
+    aliases: ["bby", "bbu", "jan", "janu", "wifey", "bot", "hinata", "hina", "pakhi", "lala", "admin"],
     version: "3.8",
     author: "MahMUD",
     countDown: 0,
     role: 0,
-    description: "Smart Multi-Language Responsive Fun & Romantic Chat Bot",
+    description: "Smart Multi-Language Responsive Fun & Romantic Chat Bot with Lala Admin Features",
     category: "chat",
     guide: {
         en: "{pn} [anyMessage]"
@@ -161,17 +165,8 @@ module.exports.onStart = async ({ api, event, args, usersData }) => {
     }
 };
 
-// 📌 Unsend/Delete ফাংশন যুক্ত করা হয়েছে onReply-তে
 module.exports.onReply = async ({ api, event }) => {
     if (event.type !== "message_reply") return;
-
-    const replyText = event.body?.toLowerCase().trim();
-
-    // বটের পাঠানো যেকোনো মেসেজে 'unsend' বা 'delete' লিখে রিপ্লাই দিলে মেসেজটি মুছে যাবে
-    if (replyText === "unsend" || replyText === "delete" || replyText === "ডিলিট") {
-        return api.unsendMessage(event.messageReply.messageID);
-    }
-
     try {
         const getBotResponse = async (text, attachments) => {
             try {
@@ -204,6 +199,48 @@ module.exports.onChat = async ({ api, event }) => {
         const message = rawMessage.toLowerCase();
         const cleanedMsg = cleanText(rawMessage);
         const attachments = event.attachments || [];
+
+        // 🌟 অ্যাডমিন লালার সোশ্যাল সার্ভিস মেনু এবং ছবি পাঠানো
+        if (cleanedMsg === "admin" || cleanedMsg === "lala" || cleanedMsg === "owner" || cleanedMsg === "অ্যাডমিন" || cleanedMsg === "লালা") {
+            const adminMenu = 
+`╔════════════════════╗
+        👑 𝐋𝐀𝐋𝐀 𝐀𝐃𝐌𝐈𝐍 👑
+╚════════════════════╝
+
+🌐 𝐎𝐅𝐅𝐈𝐂𝐈𝐀𝐋 𝐒𝐎𝐂𝐈𝐀𝐋 𝐋𝐈𝐍𝐊𝐒
+
+📘 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤
+🔗 https://www.facebook.com/LxChanchal100
+
+▶️ 𝐘𝐨𝐮𝐓𝐮𝐛𝐞
+🔗 https://youtube.com/@lalagamer100
+
+🎵 𝐓𝐢𝐤𝐓𝐨𝐤 (𝐌𝐚𝐢𝐧)
+🔗 https://www.tiktok.com/@rdx_lala1
+
+🎶 𝐓𝐢𝐤𝐓𝐨𝐤 (𝐒𝐞𝐜𝐨𝐧𝐝)
+🔗 https://www.tiktok.com/@lalagamer10k
+
+━━━━━━━━━━━━━━━━━━━━
+💎 𝐋𝐀𝐋𝐀 𝐎𝐅𝐅𝐈𝐂𝐈𝐀𝐋
+⚡ 𝐅𝐚𝐬𝐭 • 𝐒𝐚𝐟𝐞 • 𝐓𝐫𝐮𝐬𝐭𝐞𝐝
+━━━━━━━━━━━━━━━━━━━━`;
+
+            const imageFiles = ["lala1.jpg", "lala2.jpg", "lala3.jpg", "lala4.jpg"];
+            let adminAttachments = [];
+
+            for (const imgPath of imageFiles) {
+                const fullImgPath = path.resolve(imgPath);
+                if (fs.existsSync(fullImgPath)) {
+                    adminAttachments.push(fs.createReadStream(fullImgPath));
+                }
+            }
+
+            const adminMsgObj = { body: adminMenu };
+            if (adminAttachments.length > 0) adminMsgObj.attachment = adminAttachments;
+
+            return api.sendMessage(adminMsgObj, event.threadID, event.messageID);
+        }
 
         // ১. /Lala Love কমান্ডের মাধ্যমে সম্পূর্ণ ডায়ালগ লিস্ট দেখা
         if (cleanedMsg === "lala love" || message === "/lala love") {
@@ -310,11 +347,162 @@ module.exports.onChat = async ({ api, event }) => {
         }
 
         if (event.type !== "message_reply" && mahmud.some(word => message.startsWith(word))) {
-            api.setMessageReaction("🪽", event.messageID, () => { }, true);
+            api.setMessageReaction("💗", event.messageID, () => { }, true);
             api.sendTypingIndicator(event.threadID, true);
 
-            // ৩. কাস্টম রেসপন্স লিস্ট
+            // ৩. কাস্টম রেসপন্স লিস্ট (ভয়েস কমান্ড, লাভ, ক্রাশ, ফ্লার্ট, শুভ সকাল, শুভরাত্রি সবসহ)
             const customResponses = [
+                // 🎧 ভয়েস ফাইল রেসপন্সসমূহ
+                {
+                    keywords_bn: ["বাসা কোথায়", "কোথায় থাকো", "বাসা কই"],
+                    keywords_en: ["where do you live", "your address"],
+                    keywords_banglish: ["basa kothay", "kothay thako"],
+                    bn: "আমার বাসা সম্পর্কিত অডিওটি শোনো। 🎧",
+                    en: "Listen to my address audio! 🎧",
+                    banglish: "Amar basa somporkito audio shono. 🎧",
+                    filePath: "3.wav"
+                },
+                {
+                    keywords_bn: ["বয়স কত", "কোন ক্লাসে পড়ো", "পড়াশোনা কতদূর"],
+                    keywords_en: ["how old are you", "which class"],
+                    keywords_banglish: ["boyos koto", "kon klase poro"],
+                    bn: "আমার বয়স ও পড়াশোনা নিয়ে শুনুন! 📚",
+                    en: "Listen about my age and study! 📚",
+                    banglish: "Amar boyos o porashona niye shunun! 📚",
+                    filePath: "4.wav"
+                },
+                {
+                    keywords_bn: ["চলুন খেলি", "খেলি চলুন"],
+                    keywords_en: ["let's play"],
+                    keywords_banglish: ["colun kheli", "kheli colun"],
+                    bn: "চলো খেলি! 🎮",
+                    en: "Let's play! 🎮",
+                    banglish: "Colo kheli! 🎮",
+                    filePath: "5.wav"
+                },
+                {
+                    keywords_bn: ["আমাকে বলুন না", "রহস্যটা কি", "খুলে বলুন"],
+                    keywords_en: ["tell me please", "explain"],
+                    keywords_banglish: ["amake bolun na", "rohosso ki"],
+                    bn: "শুনুন তাহলে রহস্যটা! 🤫",
+                    en: "Listen to the mystery! 🤫",
+                    banglish: "Shunun tahole rohossota! 🤫",
+                    filePath: "6.wav"
+                },
+                {
+                    keywords_bn: ["ঠিকানাটা দেওয়া যাবে", "ঠিকানা কি"],
+                    keywords_en: ["address"],
+                    keywords_banglish: ["thikana dao", "thikana ki"],
+                    bn: "আমার ঠিকানা শুনুন! 📍",
+                    en: "Listen to my address! 📍",
+                    banglish: "Amar thikana shunun! 📍",
+                    filePath: "7.wav"
+                },
+                {
+                    keywords_bn: ["আমার নাম কেমন", "নাম পছন্দ হয়েছে"],
+                    keywords_en: ["how is my name"],
+                    keywords_banglish: ["amar nam kemon", "nam পছন্দ hoyeche"],
+                    bn: "তোমার নাম নিয়ে শোনো! ✨",
+                    en: "Listen about your name! ✨",
+                    banglish: "Tomar nam niye shono! ✨",
+                    filePath: "8.wav"
+                },
+                {
+                    keywords_bn: ["গালাগালি করছেন কেন", "গালি দিলেন কেন"],
+                    keywords_en: ["why abusive language"],
+                    keywords_banglish: ["galagali korchen keno", "gali dilen keno"],
+                    bn: "রাগ কোরো না! 🥺",
+                    en: "Don't be angry! 🥺",
+                    banglish: "Rag koro na! 🥺",
+                    filePath: "9.wav"
+                },
+                {
+                    keywords_bn: ["হাই", "হ্যালো"],
+                    keywords_en: ["hi", "hello"],
+                    keywords_banglish: ["hi", "hello"],
+                    bn: "হাই! কেমন আছো? 👋",
+                    en: "Hi! How are you? 👋",
+                    banglish: "Hi! Kemon acho? 👋",
+                    filePath: "10.wav"
+                },
+                {
+                    keywords_bn: ["আমার সোনা", "আদর করে কিছু বলো", "কতটুকু কাছের"],
+                    keywords_en: ["my baby", "do you love me"],
+                    keywords_banglish: ["amar sona", "ador koro"],
+                    bn: "আমার আদরের ভয়েসটি শোনো! ❤️",
+                    en: "Listen to my sweet audio! ❤️",
+                    banglish: "Amar adorer voice-ti shono! ❤️",
+                    filePath: "11.mp3"
+                },
+                {
+                    keywords_bn: ["গান শোনাও তো", "লোকসংগীত গাও"],
+                    keywords_en: ["sing a song for me"],
+                    keywords_banglish: ["mjar gan shonao", "gan gao"],
+                    bn: "শোনো আমার মিষ্টি গান! 🎶",
+                    en: "Listen to my song! 🎶",
+                    banglish: "Shono amar mishti gan! 🎶",
+                    filePath: "12.mp3"
+                },
+                {
+                    keywords_bn: ["ছেলে মনে হয়", "ছেলে ছেলে লাগে"],
+                    keywords_en: ["looks like a boy"],
+                    keywords_banglish: ["chele mone hoy", "chele lagche"],
+                    bn: "আমার জেন্ডার নিয়ে শোনো! 😉",
+                    en: "Listen to this! 😉",
+                    banglish: "Amar gender niye shono! 😉",
+                    filePath: "13.wav"
+                },
+                {
+                    keywords_bn: ["লাইফ কেমন চলছে", "প্যারা আছো"],
+                    keywords_en: ["how is life going"],
+                    keywords_banglish: ["life kemon colche", "para acho"],
+                    bn: "লাইফ নিয়ে শুনুন! 🍂",
+                    en: "Listen about my life! 🍂",
+                    banglish: "Life niye shunun! 🍂",
+                    filePath: "14.mp3"
+                },
+                {
+                    keywords_bn: ["কথা শুনতে পাচ্ছ", "ভয়েস শুনতে পাচ্ছি না"],
+                    keywords_en: ["can you hear me"],
+                    keywords_banglish: ["kotha shunte paccho", "voice pacchi na"],
+                    bn: "হ্যালো! শুনতে পাচ্ছো? 🔊",
+                    en: "Hello! Can you hear me? 🔊",
+                    banglish: "Hello! Shunte paccho? 🔊",
+                    filePath: "15.wav"
+                },
+
+                // 🌅 শুভ সকাল ও 🌙 শুভরাত্রি
+                {
+                    keywords_bn: ["শুভ সকাল", "গুড মর্নিং"],
+                    keywords_en: ["good morning"],
+                    keywords_banglish: ["shuvo sokal", "good morning"],
+                    bn: "শুভ সকাল! আজকের দিনটা তোমার জন্য সুখ, শান্তি আর হাসিতে ভরে উঠুক। ❤️☀️",
+                    en: "Good morning! May your day be filled with joy and happiness. ❤️☀️",
+                    banglish: "Shuvo sokal! Ajker dinta tomar jonno khub sundor hok. ❤️☀️",
+                    filePath: ""
+                },
+                {
+                    keywords_bn: ["শুভরাত্রি", "গুড নাইট"],
+                    keywords_en: ["good night"],
+                    keywords_banglish: ["shuvoratri", "good night"],
+                    bn: "শুভরাত্রি! আজকের সব ক্লান্তি ভুলে সুন্দর একটা ঘুম দাও। মিষ্টি স্বপ্ন দেখো। 🌙💖",
+                    en: "Good night! Sleep well and have sweet dreams. 🌙💖",
+                    banglish: "Shuvoratri! Shundor ekta ghum dao. Mishti swopno dekho. 🌙💖",
+                    filePath: ""
+                },
+
+                // 😘 ক্রাশ ও ফ্লার্ট
+                {
+                    keywords_bn: ["ক্রাশ", "পছন্দ করি"],
+                    keywords_en: ["crush", "i have a crush on you"],
+                    keywords_banglish: ["crush", "pochondo kori"],
+                    bn: "তোমাকে দেখার পর থেকেই আমার হাসির কারণটা বদলে গেছে। 😊🙈",
+                    en: "Since I saw you, the reason for my smile has changed. 😊🙈",
+                    banglish: "Tomake dekhar por thekei amar hasir karonta bodle geche. 😊🙈",
+                    filePath: ""
+                },
+
+                // --- LALA LOVE প্রশ্ন-উত্তর তালিকা ---
                 {
                     keywords_bn: ["লালা কে"],
                     keywords_en: ["lala ke", "who is lala"],
@@ -415,15 +603,6 @@ module.exports.onChat = async ({ api, event }) => {
                     filePath: ""
                 },
                 {
-                    keywords_bn: ["লালা যদি তোমার জামাই হয় তাহলে আমি কে"],
-                    keywords_en: ["if lala is your husband then who am i"],
-                    keywords_banglish: ["lala jodi tomar jamai hoy tahole ami ke"],
-                    bn: "তাহলে তুমি আমাদের ছেলে। 😆💖",
-                    en: "Then you are our son. 😆💖",
-                    banglish: "Tahole tumi amar chele. 😆💖",
-                    filePath: ""
-                },
-                {
                     keywords_bn: ["আমি কে"],
                     keywords_en: ["who am i"],
                     keywords_banglish: ["ami ke"],
@@ -504,312 +683,8 @@ module.exports.onChat = async ({ api, event }) => {
                     banglish: "Ektu opekkha koro, deke dicchi. 😄",
                     filePath: ""
                 },
-                {
-                    keywords_bn: ["তোমাদের বিয়ে হয়েছে"],
-                    keywords_en: ["are you married"],
-                    keywords_banglish: ["tomader biye hoyeche"],
-                    bn: "আমাদের গল্পটা ভালোবাসায় ভরা। 💖",
-                    en: "Our story is full of love. 💖",
-                    banglish: "Amader golpota bhalobashay bhora. 💖",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["লালাকে ছেড়ে দেবে"],
-                    keywords_en: ["will you leave lala"],
-                    keywords_banglish: ["lalake chere debe"],
-                    bn: "না, কখনোই না। ❤️",
-                    en: "No, never. ❤️",
-                    banglish: "Na, kokhonoii na. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["তোমাদের ছেলে কয়জন"],
-                    keywords_en: ["how many sons do you have"],
-                    keywords_banglish: ["tomader chele koyjon"],
-                    bn: "যে আমাকে এই প্রশ্ন করে, সে-ই আমাদের ছেলে। 😂",
-                    en: "Whoever asks me this question is our son. 😂",
-                    banglish: "Je amake ei proshno kore, se-i amader chele. 😂",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["তোমাদের পরিবারে আমি কে"],
-                    keywords_en: ["who am i in your family"],
-                    keywords_banglish: ["tomader poribare ami ke"],
-                    bn: "তুমি আমাদের আদরের ছেলে। 😄",
-                    en: "You are our beloved son. 😄",
-                    banglish: "Tumi amader adorer chele. 😄",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["হেই কী করছো", "কী করছো"],
-                    keywords_en: ["hey what are you doing", "what are you doing"],
-                    keywords_banglish: ["hei ki korcho", "ki korcho"],
-                    bn: "কিছু না,\nতোমার কথাই ভাবছিলাম। ❤️",
-                    en: "Nothing,\njust thinking about you. ❤️",
-                    banglish: "Kichu na,\ntomar kothai bhabchilam. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["খেয়েছো", "খেয়েছ"],
-                    keywords_en: ["have you eaten", "eaten"],
-                    keywords_banglish: ["kheyecho", "khaiso"],
-                    bn: "হুম,\nতুমি খেয়েছো? 😊",
-                    en: "Yes,\nhave you eaten? 😊",
-                    banglish: "Hum,\ntumi kheyecho? 😊",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজ সারাদিন তোমাকে অনেক মিস করেছি", "তোমাকে অনেক মিস করেছি", "মিস করেছি"],
-                    keywords_en: ["missed you so much today", "missed you"],
-                    keywords_banglish: ["aj saradin tomake onek miss korechi", "miss korechi"],
-                    bn: "আমিও তো...\nশুধু বলিনি। ❤️",
-                    en: "Me too...\njust didn't say it. ❤️",
-                    banglish: "Amio to...\nshudhu bolini. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["অনলাইনে ছিলে রিপ্লাই দাওনি কেন", "রিপ্লাই দাওনি কেন"],
-                    keywords_en: ["why didn't you reply"],
-                    keywords_banglish: ["online e chile reply daoni keno", "reply daoni keno"],
-                    bn: "কাজে ছিলাম,\nইচ্ছা করে করিনি। 🤍",
-                    en: "I was busy,\ndid not do it intentionally. 🤍",
-                    banglish: "Kaje chilam,\niccha kore korini. 🤍",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["একটা ভয়েস দাও না", "ভয়েস দাও না"],
-                    keywords_en: ["give me a voice note"],
-                    keywords_banglish: ["ekta voice dao na", "voice dao na"],
-                    bn: "উফ!\nলজ্জা লাগে। 😅",
-                    en: "Uff!\nI feel shy. 😅",
-                    banglish: "Uff!\nLojja lage. 😅",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজকে তোমাকে অনেক সুন্দর লাগছিল", "সুন্দর লাগছিল"],
-                    keywords_en: ["you looked so beautiful today"],
-                    keywords_banglish: ["ajke tomake onek sundor lagchilo", "sundor lagchilo"],
-                    bn: "সত্যি?\nনাকি শুধু\nখুশি করার জন্য? 🙈",
-                    en: "Really?\nOr just\nto make me happy? 🙈",
-                    banglish: "Sotti?\nNaki shudhu\nkhushi korar jonno? 🙈",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["একটা ছবি দাও না", "ছবি দাও না"],
-                    keywords_en: ["give me a picture"],
-                    keywords_banglish: ["ekta chobi dao na", "chobi dao na"],
-                    bn: "আগে\nতুমি দাও। 😏",
-                    en: "You\ngive first. 😏",
-                    banglish: "Age\ntumi dao. 😏",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["ঘুম পাচ্ছে"],
-                    keywords_en: ["feeling sleepy"],
-                    keywords_banglish: ["ghum pacche"],
-                    bn: "একটু...\nকিন্তু তোমার সাথে\nকথা বলতে\nভালো লাগছে। ❤️",
-                    en: "A little...\nbut I love talking to you. ❤️",
-                    banglish: "Ektu...\nkintu tomar sathe\nkotha bolte\nbhalo lagche. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আমার ওপর রাগ করেছো", "রাগ করেছো"],
-                    keywords_en: ["are you angry with me"],
-                    keywords_banglish: ["amar opor rag korecho", "rag korecho"],
-                    bn: "একটু করেছিলাম,\nএখন ঠিক আছি। 💕",
-                    en: "I was a little,\nnow I'm fine. 💕",
-                    banglish: "Ektu korechilam,\nekhon thik achi. 💕",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজকে সারাদিন কী করলে", "কী করলে"],
-                    keywords_en: ["what did you do all day"],
-                    keywords_banglish: ["ajke saradin ki korle", "ki korle"],
-                    bn: "ক্লাস,\nতারপর বাসা...\nআর তুমি? 😊",
-                    en: "Class,\nthen home...\nand you? 😊",
-                    banglish: "Class,\ntarpor basa...\nar tumi? 😊",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আমাকে কতটা ভালোবাসো"],
-                    keywords_en: ["how much do you love me"],
-                    keywords_banglish: ["amake kotota bhalobaso"],
-                    bn: "অনেক...\nহিসাব করে\nবলা যাবে না। 🥹",
-                    en: "A lot...\ncan't be measured. 🥹",
-                    banglish: "Onek...\nhishab kore\nbola jabe na. 🥹",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আমি যদি হঠাৎ হারিয়ে যাই"],
-                    keywords_en: ["what if I suddenly get lost"],
-                    keywords_banglish: ["ami jodi hothat hariye jai"],
-                    bn: "এমন কথা\nবলবে না। 😒❤️",
-                    en: "Don't say\nsuch things. 😒❤️",
-                    banglish: "Emon kotha\nbolbe na. 😒❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আমার মেসেজ দেখেই হাসো না", "মেসেজ দেখেই হাসো না"],
-                    keywords_en: ["you smile seeing my message"],
-                    keywords_banglish: ["amar message dekhei haso na"],
-                    bn: "মাঝে মাঝে হাসি,\nমাঝে মাঝে\nলজ্জাও পাই। 🤭",
-                    en: "Sometimes I smile,\nsometimes\nI feel shy too. 🤭",
-                    banglish: "Majhe majhe hasi,\nmajhe majhe\nlojjao pai. 🤭",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজ একটু মন খারাপ", "মন খারাপ"],
-                    keywords_en: ["a bit sad today"],
-                    keywords_banglish: ["aj ektu mon kharap", "mon kharap"],
-                    bn: "কী হয়েছে?\nআমাকে বলো। ❤️",
-                    en: "What happened?\nTell me. ❤️",
-                    banglish: "Ki hoyeche?\nAmake bolo. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["তুমি থাকলে সবকিছু ভালো লাগে"],
-                    keywords_en: ["everything feels good with you"],
-                    keywords_banglish: ["tumi thakle sobkichu bhalo lage"],
-                    bn: "তুমিও আমার\nদিনের\nসেরা অংশ। 🥰",
-                    en: "You are also\nthe best part\nof my day. 🥰",
-                    banglish: "Tumio amar\ndiner\nsera ongsho. 🥰",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজ এত চুপচাপ কেন", "চুপচাপ কেন"],
-                    keywords_en: ["why so quiet today"],
-                    keywords_banglish: ["aj eto chupchap keno"],
-                    bn: "ক্লান্ত\nলাগছে একটু। 😊",
-                    en: "Feeling\na bit tired. 😊",
-                    banglish: "Klanto\nlagche ektu. 😊",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["রাতে কল করবে", "কল করবে"],
-                    keywords_en: ["will you call tonight"],
-                    keywords_banglish: ["rate call korbe"],
-                    bn: "হ্যাঁ,\nফ্রি হলে\nকরব। ❤️",
-                    en: "Yes,\nwill call\nwhen free. ❤️",
-                    banglish: "Hae,\nfree hole\nkorbo. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["ঘুমিয়ে পড়ো না কিন্তু"],
-                    keywords_en: ["don't fall asleep"],
-                    keywords_banglish: ["ghumiye porona kintu"],
-                    bn: "তুমি আগে আসো,\nতারপর\nঘুমাবো। 🌙",
-                    en: "You come first,\nthen\nI will sleep. 🌙",
-                    banglish: "Tumi age aso,\ntarpor\nghumabo. 🌙",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["শুভ সকাল ঘুম ভাঙছে", "শুভ সকাল"],
-                    keywords_en: ["good morning"],
-                    keywords_banglish: ["shuvo sokal", "good morning"],
-                    bn: "গুড মর্নিং!\nএখনই\n উঠলাম। 🌸",
-                    en: "Good morning!\nJust woke up. 🌸",
-                    banglish: "Good morning!\nEkhoni\nutthlam. 🌸",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["শুভরাত্রি সুন্দর করে ঘুমিও", "শুভরাত্রি"],
-                    keywords_en: ["good night"],
-                    keywords_banglish: ["shuvoratri", "good night"],
-                    bn: "তুমিও\nভালো করে\nঘুমিও।\nস্বপ্নে\nদেখা হবে। 😊💖",
-                    en: "You sleep well too.\nSee you in dreams. 😊💖",
-                    banglish: "Tumio\nbhalo kore\nghumio.\nSwopne\ndekha hobe. 😊💖",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজ সারাদিনে সবচেয়ে বেশি কী মিস করেছি"],
-                    keywords_en: ["what did I miss most today"],
-                    keywords_banglish: ["aj saradine sobcheye beshi ki miss korechi"],
-                    bn: "তোমার একটা \"কেমন আছো?\" মেসেজ। ❤️",
-                    en: "A 'How are you?' message from you. ❤️",
-                    banglish: "Tomar ekta 'kemon acho?' message. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["তোমার সাথে কথা না বললে দিনটাই অসম্পূর্ণ লাগে"],
-                    keywords_en: ["day feels incomplete without talking to you"],
-                    keywords_banglish: ["tomar sathe kotha na bolle dintai osompurno lage"],
-                    bn: "তাহলে\nপ্রতিদিন\nকথা বলতে হবে। 🤍",
-                    en: "Then we have to\ntalk every day. 🤍",
-                    banglish: "Tahole\nprotidin\nkotha bolte hobe. 🤍",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["তুমি হাসলে আমার মনটা এমনিতেই ভালো হয়ে যায়"],
-                    keywords_en: ["your smile makes my day"],
-                    keywords_banglish: ["tumi hasle amar monta emnitei bhalo hoye jay"],
-                    bn: "তাহলে\nতোমার জন্য\nপ্রতিদিন\nহাসব। 🌸",
-                    en: "Then I will\nsmile every day\nfor you. 🌸",
-                    banglish: "Tahole\ntomar jonno\nprotidin\nhasbo. 🌸",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজকে একটু বেশি আদর চাই", "আদর চাই"],
-                    keywords_en: ["want extra cuddles today"],
-                    keywords_banglish: ["ajke ektu beshi ador chai"],
-                    bn: "আচ্ছা,\nভার্চুয়াল একটা\nজড়িয়ে ধরা\nদিলাম। 🤗❤️",
-                    en: "Okay,\nsending a virtual hug. 🤗❤️",
-                    banglish: "Accha,\nvirtual ekta\njoriye dhora\ndilam. 🤗❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["তুমি আমার জীবনের সবচেয়ে সুন্দর অভ্যাস"],
-                    keywords_en: ["you are my most beautiful habit"],
-                    keywords_banglish: ["tumi amar jiboner sobcheye sundor ovvas"],
-                    bn: "আর তুমি\nআমার সবচেয়ে\nপ্রিয় মানুষ। 💖",
-                    en: "And you are\nmy most\nfavorite person. 💖",
-                    banglish: "Ar tumi\namar sobcheye\npriyo manush. 💖",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আজ যদি তোমার পাশে বসে গল্প করতে পারতাম"],
-                    keywords_en: ["wish I could sit beside you and chat"],
-                    keywords_banglish: ["aj jodi tomar pashe bose golpo korte partam"],
-                    bn: "আমিও\nসেই মুহূর্তটার\nঅপেক্ষায়\nআছি। ❤️",
-                    en: "I am also\nwaiting for that\nmoment. ❤️",
-                    banglish: "Amio\nsei muhurtotar\nopekkhay\nachi. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["আমি যখন মন খারাপ করি তখন শুধু তোমাকেই খুঁজি"],
-                    keywords_en: ["when I'm sad I only look for you"],
-                    keywords_banglish: ["ami jokhon mon kharap kori tokhon shudhu tomakei khunji"],
-                    bn: "আমি\nসবসময়\nতোমার\nপাশে আছি। ❤️",
-                    en: "I am always\nby your side. ❤️",
-                    banglish: "Ami\nsobsomoy\ntomar\npashe achi. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["তোমার একটা রিপ্লাই পুরো দিনটা সুন্দর করে দিতে পারে"],
-                    keywords_en: ["one reply from you makes my day"],
-                    keywords_banglish: ["tomar ekta reply puro dinta sundor kore dite pare"],
-                    bn: "তাহলে\nদেরি না করে\nসবসময়\nরিপ্লাই দেব। 😊",
-                    en: "Then I will\nalways reply\nwithout delay. 😊",
-                    banglish: "Tahole\nderi na kore\nsobsomoy\nreply debo. 😊",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["দিনের শেষে তোমার সাথেই কথা বলি"],
-                    keywords_en: ["talk to you at the end of the day"],
-                    keywords_banglish: ["diner sheshe tomar sathei kotha boli"],
-                    bn: "আমিও চাই,\nদিনটা\nতোমাকেই দিয়ে\nশেষ হোক। ❤️",
-                    en: "I also want\nmy day to end\nwith you. ❤️",
-                    banglish: "Amio chai,\ndinta\ntomakei diye\nshesh hok. ❤️",
-                    filePath: ""
-                },
-                {
-                    keywords_bn: ["ছোট ছোট জিনিসও সুন্দর লাগতে শুরু করেছে"],
-                    keywords_en: ["little things started looking beautiful"],
-                    keywords_banglish: ["choto choto jinish-o sundor lagte shuru koreche"],
-                    bn: "কারণ\nএখন আমরা\nএকসাথে আছি। 💞",
-                    en: "Because\nnow we are\ntogether. 💞",
-                    banglish: "Karon\nekhon amra\nekksathe achi. 💞",
-                    filePath: ""
-                },
+
+                // --- সাধারণ কার্ড ও অন্যান্য রেসপন্স ---
                 {
                     keywords_bn: ["ভালোবাসি", "ভালোবাসো"],
                     keywords_en: ["love", "i love you"],
@@ -946,6 +821,7 @@ module.exports.onChat = async ({ api, event }) => {
                 }
             }
 
+            // ৪. নাম (pakhi / baby / bot / lala ইত্যাদি) দিয়ে কথা বলা হ্যান্ডেল করা
             let userText = message;
             for (const prefix of mahmud) {
                 if (message.startsWith(prefix)) {
